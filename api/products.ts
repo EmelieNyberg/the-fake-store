@@ -1,9 +1,17 @@
 // api/products.ts
 import { Product } from "@/types/product";
 
-export async function getProducts(): Promise<Product[]> {
+interface ProductsResponse {
+    products: Product[];
+    total: number;
+    skip: number;
+    limit: number;
+};
+
+export async function getProducts(): Promise<ProductsResponse> {
     try {
-        const response = await fetch("https://api.escuelajs.co/api/v1/products", {
+        // const response = await fetch(`https://api.escuelajs.co/api/v1/products?limit=${limit ?? 10}&offset=5`, {
+        const response = await fetch(`https://dummyjson.com/products?limit=10`, {
             cache: "force-cache",
         });
 

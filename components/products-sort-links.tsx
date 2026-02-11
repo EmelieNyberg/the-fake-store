@@ -4,13 +4,16 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-type ProductsSortLinksProps = {
-    currentSort?: "price_asc" | "price_desc";
-};
+// type ProductsSortLinksProps = {
+//     currentSort?: "price_asc" | "price_desc";
+// };
 
-export default function ProductsSortLinks({ currentSort }: ProductsSortLinksProps) {
+export default function ProductsSortLinks() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
+    const currentSort = searchParams.get("sort");
+
 
     const createSortURL = (sort?: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -18,11 +21,13 @@ export default function ProductsSortLinks({ currentSort }: ProductsSortLinksProp
         // reset pagination när sort byts
         params.delete("page");
 
-        if (!sort) params.delete("sort");
-        else params.set("sort", sort);
+        if (!sort) {
+            params.delete("sort")
+        }
+        else { params.set("sort", sort) };
 
-        const qs = params.toString();
-        return qs ? `${pathname}?${qs}` : pathname;
+        const qs = params.toString(); // Return här direkt
+        return `${pathname}?${qs}`;
     };
 
     return (

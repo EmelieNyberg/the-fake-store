@@ -12,7 +12,7 @@ export default async function ProductPage({
 }) {
     const { id } = await params;
     const productsList = await getProducts();
-    const product = productsList.find((product) => product.id === +id);
+    const product = productsList.products.find((product) => product.id === +id);
 
     if (!product) notFound();
 
@@ -23,7 +23,7 @@ export default async function ProductPage({
                 <div className="py-3 grid gap-10 md:grid-cols-2 md:items-center md:pt-10">
                     <div className="relative h-[50vh] w-full">
                         <Image
-                            src={product.category.image}
+                            src={product.images[0]}
                             alt={product.title}
                             className="object-cover rounded"
                             fill
@@ -34,7 +34,7 @@ export default async function ProductPage({
                         <h1 className="text-4xl font-bold">{product.title}</h1>
                         <p className="text-3xl font-bold">$ {product.price}</p>
                         <p className="text-pretty">{product.description}</p>
-                        <p>Category: {product.category.name}</p>
+                        <p>Category: {product.category}</p>
 
                         <ProductBuyBtn />
 
@@ -42,9 +42,9 @@ export default async function ProductPage({
                 </div>
                 <div className="flex gap-3">
                     {/* Fortsätt här */}
-                    {product.images.map((image, index) => (
+                    {/* {product.images.map((image, index) => (
                         <img key={index} src={image} alt={product.title} className="w-30" />
-                    ))}
+                    ))} */}
                 </div>
             </article>
         </main>

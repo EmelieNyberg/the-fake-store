@@ -13,7 +13,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <li>
             <Link href={`/products/${product.id}`}>
                 <Image
-                    src={product.category.image}
+                    src={product.images[0]}
                     alt={product.title}
                     height={500}
                     width={500}
