@@ -3,7 +3,9 @@ import { Product } from "@/types/product";
 
 export async function getProducts(): Promise<Product[]> {
     try {
-        const response = await fetch("https://api.escuelajs.co/api/v1/products");
+        const response = await fetch("https://api.escuelajs.co/api/v1/products", {
+            cache: "force-cache",
+        });
 
         if (!response.ok) {
             console.log(response);

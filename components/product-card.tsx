@@ -17,8 +17,9 @@ export default function ProductCard({ product }: ProductCardProps) {
                     alt={product.title}
                     height={500}
                     width={500}
+                    className="rounded"
                 />
-                <h3>{product.title}</h3>
+                <h3 className="font-bold truncate">{product.title}</h3>
                 <p>$ {product.price}</p>
             </Link>
         </li>
