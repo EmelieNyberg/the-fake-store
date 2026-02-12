@@ -1,5 +1,5 @@
 // app/products/[id]/page.tsx
-import { getProducts } from "@/api/products";
+import { getProduct } from "@/api/products";
 import ProductBuyBtn from "@/components/product-buy-btn";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,8 +11,7 @@ export default async function ProductPage({
     params: Promise<{ id: string }>
 }) {
     const { id } = await params;
-    const productsList = await getProducts();
-    const product = productsList.products.find((product) => product.id === +id);
+    const product = await getProduct({ id });
 
     if (!product) notFound();
 
@@ -42,9 +41,15 @@ export default async function ProductPage({
                 </div>
                 <div className="flex gap-3">
                     {/* Fortsätt här */}
-                    {/* {product.images.map((image, index) => (
-                        <img key={index} src={image} alt={product.title} className="w-30" />
-                    ))} */}
+                    {product.images.map((image, index) => (
+                        <Image
+                            key={index}
+                            src={image}
+                            alt={product.title}
+                            width={300}
+                            height={300}
+                            className="w-30" />
+                    ))}
                 </div>
             </article>
         </main>

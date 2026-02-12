@@ -2,17 +2,45 @@
 
 import { getProducts } from "@/api/products";
 import ProductCard from "@/components/product-card";
-// import ProductsSortLinks from "@/components/products-sort-links";
 
+export default async function ProductsPage({
+    searchParams,
+}: {
+    searchParams: {
+        page?: string;
+        sortBy?: string;
+        order?: string;
+    };
+}) {
+    const sp = searchParams;
 
-export default async function ProductsPage() {
+    const page = Number(sp.page ?? 1);
+    const limit = 10;
+    const skip = (page - 1) * limit;
 
-    const productsList = await getProducts();
+    // validate sortBy with Product-keys. "as const" makes it readonly.
+    const allowedSortFields = [
+        "id",
+        "title",
+        "description",
+        "category",
+        "price",
+        "images",
+    ] as const;
+
+    const fieldName = allowedSortFields.includes(sp.sortBy)
+        ? sp.sortBy
+        : undefined;
+
+    // If not asc or desc order is undefind, eg if i write banana, banana will be = undefined
+    const order = sp.order === "asc" || sp.order === "desc" ? sp.order : undefined;
+
+    const productsList = await getProducts({ limit, skip, fieldName, order });
 
     return (
         <main className="container mx-auto">
-            {/* <ProductsSortLinks currentSort={sort} /> */}
-
+            {/* for dev only */}
+            <div>page: {page}, skip: {skip}</div>
             <ul className="mt-10 grid gap-8 grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] auto-rows-fr">
                 {productsList.products.map((product) => (
                     <ProductCard key={product.id} product={product} />
@@ -21,82 +49,3 @@ export default async function ProductsPage() {
         </main>
     );
 }
-
-
-
-
-
-
-
-
-// // app/products/page.tsx
-// import { getProducts } from "@/api/products";
-// import ProductCard from "@/components/product-card";
-// import ProductsSortLinks from "@/components/products-sort-links";
-// import ProductsPagination from "@/components/products-pagination";
-// import { Product } from "@/types/product";
-
-// const PER_PAGE = 8;
-
-// function getString(value: string | string[] | undefined) {
-//     if (!value) return undefined;
-//     return Array.isArray(value) ? value[0] : value;
-// }
-
-// function getPositiveInt(value: string | string[] | undefined, fallback: number) {
-//     const s = getString(value);
-//     const n = s ? Number(s) : NaN;
-//     return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
-// }
-
-// function sortProducts(products: Product[], sort?: string) {
-//     const list = [...products];
-
-//     if (sort === "price_asc") list.sort((a, b) => a.price - b.price);
-//     if (sort === "price_desc") list.sort((a, b) => b.price - a.price);
-
-//     return list;
-// }
-
-// export default async function ProductsPage({
-//     searchParams,
-// }: {
-//     searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-// }) {
-//     const sp = await searchParams;
-
-//     const sort = getString(sp.sort);
-//     const page = getPositiveInt(sp.page, 1);
-
-//     const productsList = await getProducts(4);
-//     const sorted = sortProducts(productsList, sort);
-
-//     const totalPages = Math.max(1, Math.ceil(sorted.length / PER_PAGE));
-
-//     // ⭐ DENNA ÄR NYCKELN
-//     const safePage = Math.min(Math.max(page, 1), totalPages);
-
-//     const start = (safePage - 1) * PER_PAGE;
-//     const paginated = sorted.slice(start, start + PER_PAGE);
-
-//     return (
-//         <main className="container mx-auto">
-//             <ProductsSortLinks />
-
-//             <div className="mt-4 flex items-center justify-between">
-//                 <p className="text-sm text-gray-600">
-//                     Page {safePage} of {totalPages}
-//                 </p>
-
-//                 {/* ⭐ safePage skickas in */}
-//                 <ProductsPagination page={safePage} totalPages={totalPages} />
-//             </div>
-
-//             <ul className="mt-6 grid gap-8 grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] auto-rows-fr">
-//                 {paginated.map((product) => (
-//                     <ProductCard key={product.id} product={product} />
-//                 ))}
-//             </ul>
-//         </main>
-//     );
-// }
