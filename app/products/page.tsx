@@ -12,7 +12,7 @@ export default async function ProductsPage({
         order?: string;
     };
 }) {
-    const sp = searchParams;
+    const sp = await searchParams;
 
     const page = Number(sp.page ?? 1);
     const limit = 10;
@@ -28,8 +28,23 @@ export default async function ProductsPage({
         "images",
     ] as const;
 
-    const fieldName = allowedSortFields.includes(sp.sortBy)
-        ? sp.sortBy
+    // NYTT
+    type SortField = typeof allowedSortFields[number]; // "id" | "title" | "description"...
+    function isSortField(value: unknown): value is SortField {
+        return (
+            typeof value === "string" && (allowedSortFields as readonly string[]).includes(value)
+        );
+    }
+
+    const sortBy = sp.sortBy;
+
+    // const fieldName = allowedSortFields.includes(sortBy)
+    //     ? sortBy
+    //     : "title";
+
+    // NYTT
+    const fieldName: SortField | undefined = isSortField(sortBy)
+        ? sortBy
         : undefined;
 
     // If not asc or desc order is undefind, eg if i write banana, banana will be = undefined
@@ -40,7 +55,7 @@ export default async function ProductsPage({
     return (
         <main className="container mx-auto">
             {/* for dev only */}
-            <div>page: {page}, skip: {skip}</div>
+            <div>page: {page}, skip: {skip}, fieldname: {fieldName}, order: {order}</div>
             <ul className="mt-10 grid gap-8 grid-cols-[repeat(auto-fit,minmax(min(250px,100%),1fr))] auto-rows-fr">
                 {productsList.products.map((product) => (
                     <ProductCard key={product.id} product={product} />
