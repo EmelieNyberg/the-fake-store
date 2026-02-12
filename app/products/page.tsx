@@ -14,9 +14,13 @@ export default async function ProductsPage({
 }) {
     const sp = await searchParams;
 
+    ////// PAGINATION //////
+
     const page = Number(sp.page ?? 1);
     const limit = 10;
     const skip = (page - 1) * limit;
+
+    ////// SORT BY //////
 
     // validate sortBy with Product-keys. "as const" makes it readonly.
     const allowedSortFields = [
@@ -29,7 +33,15 @@ export default async function ProductsPage({
     ] as const;
 
     // NYTT
-    type SortField = typeof allowedSortFields[number]; // "id" | "title" | "description"...
+    type SortField = typeof allowedSortFields[number]; //=> "id" | "title" | "description"...(https://mimo.org/glossary/typescript/typeof-type-operator)
+
+    // TS req that we check unknown values before it allows the value, therefore this function (returns true | false).
+    // value: unknown (needed since anyhing can be put in the url, eg sortBy=title sortBy=banana sortBy=123)
+    // value is SortField (promise to TS "if this function ends with true, I promise value is a SortField")
+    // typeof checks type eg "string" "number" "undefined"
+    // allowedSortFields.includes(value) checks if array includes value
+    // as readonly string[] = pure TS promise
+    // If typeof value is a string and the value is included in allowedSortFields = true
     function isSortField(value: unknown): value is SortField {
         return (
             typeof value === "string" && (allowedSortFields as readonly string[]).includes(value)
@@ -38,16 +50,15 @@ export default async function ProductsPage({
 
     const sortBy = sp.sortBy;
 
-    // const fieldName = allowedSortFields.includes(sortBy)
-    //     ? sortBy
-    //     : "title";
-
     // NYTT
+    // if isSortField = true, fieldName=sortBy otherwise fieldName=undefined
     const fieldName: SortField | undefined = isSortField(sortBy)
         ? sortBy
         : undefined;
 
-    // If not asc or desc order is undefind, eg if i write banana, banana will be = undefined
+    ////// ORDER //////
+
+    // If not asc or desc order is undefind, eg if I write banana, banana will be = undefined
     const order = sp.order === "asc" || sp.order === "desc" ? sp.order : undefined;
 
     const productsList = await getProducts({ limit, skip, fieldName, order });
